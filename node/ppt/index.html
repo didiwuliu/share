@@ -337,7 +337,7 @@ npm update -global npm 更新npm</pre>
     </ul>
 </article>
 
-<article>
+<article class="smaller">
     <h3>
         Express简介
     </h3>
@@ -349,6 +349,510 @@ npm update -global npm 更新npm</pre>
     <p>
         安装完成后，在工作目录新建一个新项目，假定叫做node-demo。
         <pre>express node-demo</pre>
+    </p>
+    <p>
+        这时，工作目录中就会生成一个node-demo子目录。进入该目录，安装所需要的模块。
+        <pre>cd node-demo
+npm installl</pre>
+    </p>
+    <p>
+        如果浏览这个子目录，就会发现express自动生成了以下的子目录和文件。
+    </p>
+    <ul>
+        <li>node_modules子目录：用于安装本地模块。</li>
+    </ul>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <ul>
+        <li>public子目录：用于存放用户可以下载到的文件，比如图片、脚本、样式表等。</li>
+        <li>routes子目录：用于存放路由文件。</li>
+        <li>views子目录：用于存放网页的模板。</li>
+        <li>app.js文件：应用程序的启动脚本。</li>
+        <li>package.json文件：项目的配置文件。</li>
+    </ul>
+    <p>
+        然后，在命令行下运行下面的命令，就可以在浏览器中访问项目网站了。
+        <pre>node app</pre>
+    </p>
+    <p>
+        默认情况下，网站运行在本机的3000端口，网页显示Welcome to Express。
+    </p>
+    <h4>
+        运行原理
+    </h4>
+    <p>
+        底层：http模块<br />
+        Express框架建立在node.js内置的http模块上。
+        http模块生成服务器的原始代码如下。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+var http = require("http");
+var app = http.createServer(function(request, response) {
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.end("Hello world!\n");
+});
+app.listen(1337, "localhost");
+console.log("Server running at http://localhost:1337/");</pre>
+    </p>
+    <p>
+        上面代码的关键是http模块的createServer方法，表示生成一个HTTP服务器实例。该方法接受一个回调函数，该回调函数的参数，分别为代表HTTP请求和HTTP回应的request对象和response对象。
+    </p>
+    <p>
+        对http模块的再包装<br />
+        Express框架的核心是对http模块的再包装。上面的代码用Express改写如下。
+        <pre style="margin-top:1px;">var express = require("express");
+var http = require("http");
+var app = express();
+app.use(function(request, response) {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Hello world!\n");
+});
+http.createServer(app).listen(1337);</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        比较两段代码，可以看到它们非常接近，唯一的差别是createServer方法的参数，从一个回调函数变成了一个Epress对象的实例。而这个实例使用了use方法，加载了与上一段代码相同的回调函数。
+        Express框架等于在http模块之上，加了一个中间层，而use方法则相当于调用中间件。
+    </p>
+    <h4 style="margin-bottom:10px;">
+        什么是中间件
+    </h4>
+    <p>
+        简单说，中间件（middleware）就是处理HTTP请求的函数，用来完成各种特定的任务，比如检查用户是否登录、分析数据、以及其他在需要最终将数据发送给用户之前完成的任务。它最大的特点就是，一个中间件处理完，再传递给下一个中间件。
+    </p>
+    <p>
+        node.js的内置模块http的createServer方法，可以生成一个服务器实例，该实例允许在运行过程中，调用一系列函数（也就是中间件）。当一个HTTP请求进入服务器，服务器实例会调用第一个中间件，完成后根据设置，决定是否再调用下一个中间件。中间件内部可以使用服务器实例的response对象（ServerResponse，即回调函数的第二个参数），以及一个next回调函数（即第三个参数）。每个中间件都可以对HTTP请求（request对象）做出回应，并且决定是否调用next方法，将request对象再传给下一个中间件。
+    </p>
+    <p>
+        一个不进行任何操作、只传递request对象的中间件，大概是下面这样：
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+function uselessMiddleware(req, res, next) {
+    next();
+}</pre>
+    </p>
+    <p>
+        上面代码的next为中间件的回调函数。如果它带有参数，则代表抛出一个错误，参数为错误文本。
+    </p>
+    <p>
+        <pre>
+function uselessMiddleware(req, res, next) {
+    next('出错了！');
+}</pre>
+    </p>
+    <p>
+        抛出错误以后，后面的中间件将不再执行，直到发现一个错误处理函数为止。
+    </p>
+    <h4>
+        use方法
+    </h4>
+    <p>
+        use是express调用中间件的方法，它返回一个函数。下面是一个连续调用两个中间件的例子。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+var express = require("express");
+var http = require("http");
+var app = express();
+app.use(function(request, response, next) {
+    console.log("In comes a " + request.method + " to " + request.url);
+    next();
+});
+app.use(function(request, response) {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Hello world!\n");
+});
+http.createServer(app).listen(1337);
+</pre>
+    </p>
+    <p>
+        上面代码先调用第一个中间件，在控制台输出一行信息，然后通过next方法，调用第二个中间件，输出HTTP回应。由于第二个中间件没有调用next方法，所以不再request对象就不再向后传递了。
+    </p>
+    <p>
+        使用use方法，可以根据请求的网址，返回不同的网页内容。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+var express = require("express");
+var http = require("http");
+var app = express();
+app.use(function(request, response, next) {
+  if (request.url == "/") {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Welcome to the homepage!\n");
+  } else {
+    next();
+  }
+});
+app.use(function(request, response, next) {
+  if (request.url == "/about") {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+  } else {
+    next();
+  }
+});
+app.use(function(request, response) {
+  response.writeHead(404, { "Content-Type": "text/plain" });
+  response.end("404 error!\n");
+});
+http.createServer(app).listen(1337);
+</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        上面代码通过request.url属性，判断请求的网址，从而返回不同的内容。
+        除了在回调函数内部，判断请求的网址，Express也允许将请求的网址写在use方法的第一个参数。
+        <pre style="margin-top:1px;margin-bottom: 1px;">
+        app.use('/', someMiddleware);</pre>
+    </p>
+    <p>
+        上面代码表示，只对根目录的请求，调用某个中间件。
+        因此，上面的代码可以写成下面的样子。
+        <pre style="margin-top:1px;">
+var express = require("express");
+var http = require("http");
+var app = express();
+app.use("/", function(request, response, next) {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Welcome to the homepage!\n");
+});
+app.use("/about", function(request, response, next) {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Welcome to the about page!\n");
+});
+app.use(function(request, response) {
+    response.writeHead(404, { "Content-Type": "text/plain" });
+    response.end("404 error!\n");
+});
+
+http.createServer(app).listen(1337);</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h4 style="margin-top:10px;margin-bottom: 10px;">
+        Express的方法
+    </h4>
+    <p>
+        all方法和HTTP动词方法<br />
+        针对不同的请求，Express提供了use方法的一些别名。比如，上面代码也可以用别名的形式来写。
+        <pre>
+var express = require("express");
+var http = require("http");
+var app = express();
+app.all("*", function(request, response, next) {
+    response.writeHead(200, { "Content-Type": "text/plain" });
+next();
+});
+app.get("/", function(request, response) {
+    response.end("Welcome to the homepage!");
+});
+app.get("/about", function(request, response) {
+    response.end("Welcome to the about page!");
+});
+app.get("*", function(request, response) {
+    response.end("404!");
+});
+http.createServer(app).listen(1337);</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        上面代码的all方法表示，所有请求都必须通过该中间件，参数中的“*”表示对所有路径有效。get方法则是只有GET动词的HTTP请求通过该中间件，它的第一个参数是请求的路径。由于get方法的回调函数没有调用next方法，所以只要有一个中间件被调用了，后面的中间件就不会再被调用了。
+    </p>
+    <p>
+        除了get方法以外，Express还提供post、put、delete方法，即HTTP动词都是Express的方法。
+    </p>
+    <p>
+        这些方法的第一个参数，都是请求的路径。除了绝对匹配以外，Express允许模式匹配。
+        <pre>
+app.get("/hello/:who", function(req, res) {
+    res.end("Hello, " + req.params.who + ".");
+});</pre>
+    </p>
+    <p>
+        上面代码将匹配“/hello/alice”网址，网址中的alice将被捕获，作为req.params.who属性的值。需要注意的是，捕获后需要对网址进行检查，过滤不安全字符，上面的写法只是为了演示，生产中不应这样直接使用用户提供的值。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        如果在模式参数后面加上问号，表示该参数可选。
+        <pre>
+app.get('/hello/:who?',function(req,res) {
+if(req.params.id) {
+    res.end("Hello, " + req.params.who + ".");
+}
+else {
+    res.send("Hello, Guest.");
+}
+});</pre>
+    </p>
+    <p>
+        下面是一些更复杂的模式匹配的例子。
+        <pre>
+app.get('/forum/:fid/thread/:tid', middleware)
+// 匹配/commits/71dbb9c
+// 或/commits/71dbb9c..4c084f9这样的git格式的网址
+app.get(/^\/commits\/(\w+)(?:\.\.(\w+))?$/, function(req, res){
+    var from = req.params[0];
+    var to = req.params[1] || 'HEAD';
+    res.send('commit range ' + from + '..' + to);
+});</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h4>
+        set方法
+    </h4>
+    <p>
+        set方法用于指定变量的值。
+        <pre>
+app.set("views", __dirname + "/views");
+app.set("view engine", "jade");</pre>
+    </p>
+    <p>
+        上面代码使用set方法，为系统变量“views”和“view engine”指定值。
+    </p>
+    <h4 style="margin-bottom: 10px;">
+        response对象
+    </h4>
+    <p>
+        response.redirect方法<br />
+        response.redirect方法允许网址的重定向。
+        <pre>
+response.redirect("/hello/anime");
+response.redirect("http://www.example.com");
+response.redirect(301, "http://www.example.com");</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        response.sendFile方法<br />
+        response.sendFile方法用于发送文件。
+        <pre>
+        response.sendFile("/path/to/anime.mp4");</pre>
+    </p>
+    <p>
+        response.render方法<br />
+        response.render方法用于渲染网页模板。
+        <pre>
+app.get("/", function(request, response) {
+    response.render("index", { message: "Hello World" });
+});</pre>
+    </p>
+    <p>
+        上面代码使用render方法，将message变量传入index模板，渲染成HTML网页。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h4>
+        requst对象
+    </h4>
+    <p>
+        request.ip<br />
+        request.ip属性用于获得HTTP请求的IP地址。
+    </p>
+    <p>
+        request.files<br />
+        request.files用于获取上传的文件。
+    </p>
+    <h4>
+        项目开发实例
+    </h4>
+    <p>
+        上一节使用express命令自动建立项目，也可以不使用这个命令，手动新建所有文件。
+    </p>
+    <p>
+        先建立一个项目目录（假定这个目录叫做demo）。进入该目录，新建一个package.json文件，写入项目的配置信息。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>{
+    "name": "demo",
+    "description": "My First Express App",
+    "version": "0.0.1",
+    "dependencies": {
+        "express": "3.x"
+    }
+}</pre>
+    </p>
+    <p>
+        在项目目录中，新建文件app.js。项目的代码就放在这个文件里面。
+        <pre>
+var express = require('express');
+var app = express();</pre>
+    </p>
+    <p>
+        上面代码首先加载express模块，赋给变量express。然后，生成express实例，赋给变量app。
+        接着，设定express实例的参数。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+// 设定port变量，意为访问端口
+app.set('port', process.env.PORT || 3000);
+
+// 设定views变量，意为视图存放的目录
+app.set('views', path.join(__dirname, 'views'));
+
+// 设定view engine变量，意为网页模板引擎
+app.set('view engine', 'jade');
+
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(app.router);
+
+// 设定静态文件目录，比如本地文件
+// 目录为demo/public/images，访问
+// 网址则显示为http://localhost:3000/images
+app.use(express.static(path.join(__dirname, 'public')));</pre>
+    </p>
+    <p>
+        上面代码中的set方法用于设定内部变量，use方法用于调用express的中间件。
+        最后，调用实例方法listen，让其监听事先设定的端口（3000）。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>app.listen(app.get('port'));</pre>
+    </p>
+    <p>
+        这时，运行下面的命令，就可以在浏览器访问http://127.0.0.1:3000。
+        <pre>node app.js</pre>
+    </p>
+    <p>
+        网页提示“Cannot GET /”，表示没有为网站的根路径指定可以显示的内容。所以，下一步就是配置路由。
+    </p>
+    <h4>
+        配置路由
+    </h4>
+    <p>
+        所谓“路由”，就是指为不同的访问路径，指定不同的处理方法。
+        指定根路径
+        在app.js之中，先指定根路径的处理方法。
+        <pre>
+app.get('/', function(req, res) {
+    res.send('Hello World');
+});</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        上面代码的get方法，表示处理客户端发出的GET请求。相应的，还有app.post、app.put、app.del（delete是JavaScript保留字，所以改叫del）方法。
+    </p>
+    <p>
+        get方法的第一个参数是访问路径，正斜杠（/）就代表根路径；第二个参数是回调函数，它的req参数表示客户端发来的HTTP请求，res参数代表发向客户端的HTTP回应，这两个参数都是对象。在回调函数内部，使用HTTP回应的send方法，表示向浏览器发送一个字符串。然后，运行下面的命令。
+        <pre>node app.js</pre>
+    </p>
+    <p>
+        此时，在浏览器中访问http://127.0.0.1:3000，网页就会显示“Hello World”。
+        如果需要指定HTTP头信息，回调函数就必须换一种写法，要使用setHeader方法与end方法。
+        <pre>
+app.get('/', function(req, res){
+    var body = 'Hello World';
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Length', body.length);
+    res.end(body);
+});</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
     </p>
 </article>
 
