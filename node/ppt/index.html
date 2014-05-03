@@ -26,6 +26,7 @@
     slides below. -->
 <article class='biglogo'>
 </article>
+
 <article>
     <h1>
         使用nodejs构建web网站
@@ -36,6 +37,7 @@
         2014年5月3日
     </p>
 </article>
+
 <article>
     <h3>
         概述
@@ -49,6 +51,7 @@
     </ul>
     </p>
 </article>
+
 <article>
     <h3>
         nodejs基础
@@ -285,7 +288,7 @@ npm set init.author.url "http://www.yongche.com"</pre>
         <li>+ 如果是新增了功能，但是向下兼容，需要更新Y位。</li>
         <li>+ 如果有大变动，向下不兼容，需要更新X位。</li>
     </ul>
-    <h4>npm命令</h4>
+    <h4 style="margin-top:10px;margin-bottom:10px;">npm命令</h4>
     <p>
         <pre>npm help 查看所有命令
 npm help &lt;command&gt; 可查看某条命令的详细帮助
@@ -334,10 +337,183 @@ npm update -global npm 更新npm</pre>
     </ul>
 </article>
 
+<article>
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        Express是目前最流行的基于Node.js的Web开发框架。它可以快速地搭建网站原型。
+        Express是一个node.js模块，采用npm全局模块。
+        <pre>sudo npm install -g express-generator@3</pre>
+    </p>
+    <p>
+        安装完成后，在工作目录新建一个新项目，假定叫做yongche-web。
+        <pre>express yongche-web</pre>
+    </p>
+</article>
+
 <article class="smaller">
     <h3>
         events模块
     </h3>
+    <h4>
+        基本用法
+    </h4>
+    <p>
+        events模块是node.js对“发布/订阅”模式（publish/subscribe）的部署。也就说，通过events模块的EventEmitter属性，建立一个消息中心；然后通过on方法，为各种事件指定回调函数，从而将程序转为事件驱动型，各个模块之间通过事件联系。
+        <pre>
+var EventEmitter = require("events").EventEmitter;
+var ee = new EventEmitter();
+ee.on("someEvent", function () {
+    console.log("event has occured");
+});
+ee.emit("someEvent");
+        </pre>
+    </p>
+    <p>
+        上面代码在加载events模块后，通过EventEmitter属性建立了一个EventEmitter对象实例，这个实例就是消息中心。然后，通过on方法为someEvent事件指定回调函数。最后，通过emit方法触发someEvent事件。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        emit方法还接受第二个参数，用于向回调函数提供参数。
+        <pre>
+ee.on("someEvent", function (data){
+    console.log(data);
+});
+ee.emit("someEvent", data);
+//默认情况下，Node.js允许同一个事件最多可以触发10个回调函数。
+ee.on("someEvent", function () { console.log("event 1"); });
+ee.on("someEvent", function () { console.log("event 2"); });
+ee.on("someEvent", function () { console.log("event 3"); });
+//超过10个回调函数，会发出一个警告。这个门槛值可以通过setMaxListeners方法改变。
+ee.setMaxListeners(20);
+//events模块的作用，还表示在其他模块可以继承这个模块，因此也就拥有了EventEmitter接口。
+var util = require("util");
+var EventEmitter = require("events").EventEmitter;
+function UserList () {
+    EventEmitter.call(this);
+}
+util.inherits(UserList, EventEmitter);
+UserList.prototype.save = function (obj) {
+    // save into database
+    this.emit("saved-user", obj);
+};</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        上面代码新建了一个构造函数UserList，然后让其继承EventEmitter，因此UserList就拥有了EventEmitter的接口。最后，为UserList的实例定义一个save方法，表示将数据储存进数据库，在储存完毕后，使用EventEmitter接口的emit方法，触发一个saved-user事件。
+    </p>
+    <h4>
+        事件类型
+    </h4>
+    <p>
+        events模块默认支持一些事件。
+    </p>
+    <ul>
+        <li>newListener事件：添加新的回调函数时触发。</li>
+        <li>removeListener事件：移除回调时触发。</li>
+    </ul>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        <pre>ee.on("newListener", function (evtName){
+    console.log("New Listener: " + evtName);
+});
+
+ee.on("removeListener", function (evtName){
+    console.log("Removed Listener: " + evtName);
+});
+
+function foo (){}
+
+ee.on("save-user", foo);
+ee.removeListener("save-user", foo);
+
+// New Listener: removeListener
+// New Listener: save-user
+// Removed Listener: save-user</pre>
+    </p>
+    <p>
+        上面代码会触发两次newListener事件，以及一次removeListener事件。
+    </p>
+    <h4>EventEmitter对象的其他方法</h4>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        once方法<br />
+        该方法类似于on方法，但是回调函数只触发一次。
+        <pre>ee.once("firstConnection", function (){
+    console.log("本提示只出现一次");
+});</pre>
+    </p>
+    <p>
+        removeListener方法<br />
+        该方法用于移除回调函数。它接受两个参数，第一个是事件名称，第二个是回调函数名称。这就是说，不能用于移除匿名函数。
+        <pre>function onlyOnce () {
+    console.log("You'll never see this again");
+    ee.removeListener("firstConnection", onlyOnce);
+}‘
+ee.on("firstConnection", onlyOnce);</pre>
+    </p>
+    <p>
+        上面代码起到与once方法类似效果。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        removeAllListeners方法<br />
+        该方法用于移除某个事件的所有回调函数。
+        <pre style="margin-top:1px;">ee.removeAllListeners("firstConnection");</pre>
+    </p>
+    <p>
+        如果不带参数，则表示移除所有事件的所有回调函数。
+        <pre style="margin-top:1px;">ee.removeAllListeners();</pre>
+    </p>
+    <p>
+        listener方法<br />
+        该方法接受一个事件名称作为参数，返回该事件所有回调函数组成的数组。
+        <pre style="margin-top:1px;">function onlyOnce () {
+    console.log(ee.listeners("firstConnection"));
+    ee.removeListener("firstConnection", onlyOnce);
+    console.log(ee.listeners("firstConnection"));
+}
+ee.on("firstConnection", onlyOnce)
+ee.emit("firstConnection");
+ee.emit("firstConnection");
+// [ [Function: onlyOnce] ]
+// []</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        events模块
+    </h3>
+    <p>
+        上面代码显示两次回调函数组成的数组，第一次只有一个回调函数onlyOnce，第二次是一个空数组，因为removeListener方法取消了回调函数。
+    </p>
 </article>
 
 <article class="smaller">
@@ -495,7 +671,6 @@ req.end();
         request对象的第一个参数是options对象，用于指定请求的域名和路径，第二个参数是请求完成后的回调函数。
         <pre>
 //如果使用POST方法发出请求，只需在options对象中设定即可。
-
 var options = {
     host: 'www.example.com',
     path: '/',
@@ -504,7 +679,6 @@ var options = {
 };
 
 //指定HTTP头信息，也是在options对象中设定。
-
 var options = {
     headers: {'custom': 'Custom Header Demo works'}
 };
@@ -550,6 +724,10 @@ var server = https.createServer(options, function (req, res) {
     <h3>
         http模块
     </h3>
+    <p>
+        上面代码显示，HTTPs服务器与HTTP服务器的最大区别，就是createServer方法多了一个options参数。运行以后，就可以测试是否能够正常访问。
+    <pre>curl -k https://localhost:8000</pre>
+    </p>
     <p>
         http说明官方文档： <a href="http://nodejs.org/api/http.html" target="_blank">http://nodejs.org/api/http.html</a>
     </p>
