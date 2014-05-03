@@ -344,17 +344,229 @@ npm update -global npm 更新npm</pre>
     <h3>
         http模块
     </h3>
+    <p>
+        NodeJS本来的用途是编写高性能Web服务器。我们首先在这里重复一下官方文档里的例子，使用NodeJS内置的http模块简单实现一个HTTP服务器。
+        <pre>var http = require('http');
+http.createServer(function (request, response) {
+    response.writeHead(200, { 'Content-Type': 'text-plain' });
+    response.end('Hello World\n');
+}).listen(8080);
+console.log('Server running on port 8080.');</pre>
+    </p>
+    <p>
+        上面代码第一行 var http = require("http")，表示加载http模块。然后，调用http模块的createServer方法，创造一个服务器实例，将它赋给变量http。
+    </p>
+    <p>
+        ceateServer方法接受一个函数作为参数，该函数的req参数是一个对象，表示客户端的HTTP请求；res参数也是一个对象，表示服务器端的HTTP回应。rese.writeHead方法表示，服务器端回应一个HTTP头信息；response.end方法表示，服务器端回应的具体内容，以及回应完成后关闭本次对话。最后的listen(8080)表示启动服务器实例，监听本机的8080端口。
+        将上面这几行代码保存成文件app.js，然后用node调用这个文件，服务器就开始运行了。
+        <pre style="margin-top:1px;">node app.js</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <p>
+        这时命令行窗口将显示一行提示“Server running at port 8080.”。打开浏览器，访问http://localhost:8080，网页显示“Hello world!”。
+    </p>
+    <p>
+        上面的例子是当场生成网页，也可以事前写好网页，存在文件中，然后利用fs模块读取网页文件，将其返回。
+        <pre>
+var http = require('http');
+var fs = require('fs');
+
+http.createServer(function (request, response){
+
+fs.readFile('data.txt', function readData(err, data) {
+    response.writeHead(200, {'Content-Type': 'text/plain'});
+    response.end(data);
+});
+
+}).listen(8080, "127.0.0.1");
+
+console.log('Server running on port 8080.');
+</pre>
+    </p>
+    <p>
+        下面的修改则是根据不同网址的请求，显示不同的内容，已经相当于做出一个网站的雏形了。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <p>
+        <pre>
+var http = require("http");
+http.createServer(function(req, res) {
+    // 主页
+    if (req.url == "/") {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end("Welcome to the homepage!");
+    }
+    // About页面
+    else if (req.url == "/about") {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end("Welcome to the about page!");
+    }
+    // 404错误
+    else {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("404 error! File not found.");
+    }
+}).listen(8080, "localhost");
+        </pre>
+    </p>
+    <p>
+        回调函数的req（request）对象，拥有以下属性。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <ul>
+        <li>url：发出请求的网址。</li>
+        <li>method：HTTP请求的方法。</li>
+        <li>headers：HTTP请求的所有HTTP头信息。</li>
+    </ul>
+    <h4 style="margin-top:10px;margin-bottom:10px">处理POST请求</h4>
+    <p>
+        当客户端采用POST方法发送数据时，服务器端可以对data和end两个事件，设立监听函数。
+        <pre style="margin-top:1px;">
+var http = require('http');
+http.createServer(function (req, res) {
+    var content = "";
+    req.on('data', function (chunk) {
+        content += chunk;
+    });
+    req.on('end', function () {
+        res.writeHead(200, {"Content-Type": "text/plain"});
+        res.write("You've sent: " + content);
+        res.end();
+    });
+}).listen(8080);
+        </pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <h4 style="margin-top:10px;margin-bottom:10px">
+        发出请求：request方法
+    </h4>
+    <p style="margin-top:10px;margin-bottom:10px">
+    request方法用于发出HTTP请求。
+    <pre style="margin-top:1px;overflow-x:scroll">
+var http = require('http');
+//The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
+var options = {
+    host: 'www.random.org',
+    path: '/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
+};
+var callback = function(response) {
+    var str = '';
+    //another chunk of data has been received, so append it to `str`
+    response.on('data', function (chunk) {
+        str += chunk;
+    });
+    //the whole response has been received, so we just print it out here
+    response.on('end', function () {
+        console.log(str);
+    });
+}
+var req = http.request(options, callback);
+req.write("hello world!");
+req.end();
+    </pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <p>
+        request对象的第一个参数是options对象，用于指定请求的域名和路径，第二个参数是请求完成后的回调函数。
+        <pre>
+//如果使用POST方法发出请求，只需在options对象中设定即可。
+
+var options = {
+    host: 'www.example.com',
+    path: '/',
+    port: '80',
+    method: 'POST'
+};
+
+//指定HTTP头信息，也是在options对象中设定。
+
+var options = {
+    headers: {'custom': 'Custom Header Demo works'}
+};
+        </pre>
+    </p>
+    <h4>
+        搭建HTTPs服务器
+    </h4>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <p>
+        搭建HTTPs服务器需要有SSL证书。对于向公众提供服务的网站，SSL证书需要向证书颁发机构购买；对于自用的网站，可以自制。
+        自制SSL证书需要OpenSSL，具体命令如下。
+        <pre style="margin-top:1px">
+openssl genrsa -out key.pem
+openssl req -new -key key.pem -out csr.pem
+openssl x509 -req -days 9999 -in csr.pem -signkey key.pem -out cert.pem
+rm csr.pem
+        </pre>
+    </p>
+    <p>
+        上面的命令生成两个文件：cert.pem（证书文件）和 key.pem（私钥文件）。有了这两个文件，就可以运行HTTPs服务器了。
+        <pre style="margin-top:1px">
+var https = require('https');
+var fs = require('fs');
+var options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
+var server = https.createServer(options, function (req, res) {
+    res.writeHead(200);
+    res.end("hello world\n");
+}).listen(8000);
+        </pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        http模块
+    </h3>
+    <p>
+        http说明官方文档： <a href="http://nodejs.org/api/http.html" target="_blank">http://nodejs.org/api/http.html</a>
+    </p>
 </article>
 
 <article class='smaller'>
     <h3>
         websocket
     </h3>
-    <p>
-    </p>
-    <p>
-    </p>
 </article>
+
+<article>
+    <h1 style="text-align:center">
+        谢谢!
+    </h1>
+</article>
+
 <article>
     <h3>
         Slide with bullet points and a longer title, just because we
