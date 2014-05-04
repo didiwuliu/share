@@ -58,11 +58,11 @@ app.use(express.static(path.join(__dirname, 'public')));
     res.end(body);
 });*/
 
-app.get('/api', function(request, response) {
+/*app.get('/api', function(request, response) {
     response.send({name:"张三",age:40});
-});
+});*/
 
-app.get('/api', api.index);
+//app.get('/api', api.index);
 
 /*app.get('/', function(req, res) {
     res.sendfile('./views/index.html');
