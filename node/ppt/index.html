@@ -844,7 +844,23 @@ app.get('/', function(req, res){
     <h3>
         Express简介
     </h3>
+    <h4>
+        指定特定路径
+    </h4>
     <p>
+        上面是处理根目录的情况，下面再举一个例子。假定用户访问/api路径，希望返回一个JSON字符串。这时，get可以这样写。
+        <pre>
+app.get('/api', function(request, response) {
+    response.send({name:"张三",age:40});
+});</pre>
+    </p>
+    <p>
+        上面代码表示，除了发送字符串，send方法还可以直接发送对象。重新启动node以后，再访问路径/api，浏览器就会显示一个JSON对象。
+        <pre>
+{
+    "name": "张三",
+    "age": 40
+}</pre>
     </p>
 </article>
 
@@ -853,6 +869,143 @@ app.get('/', function(req, res){
         Express简介
     </h3>
     <p>
+        我们也可以把app.get的回调函数，封装成模块。先在routes目录下面建立一个api.js文件。
+        <pre>
+// routes/api.js
+exports.index = function (req, res){
+    res.json(200, {name:"张三",age:40});
+}</pre>
+    </p>
+    <p>
+        现在访问时，就会显示与上一次同样的结果。
+        如果只向浏览器发送简单的文本信息，上面的方法已经够用；但是如果要向浏览器发送复杂的内容，还是应该使用网页模板。
+    </p>
+    <h4>
+        静态网页模板
+    </h4>
+    <p>
+        在项目目录之中，建立一个子目录views，用于存放网页模板。
+        假定这个项目有三个路径：根路径（/）、自我介绍（/about）和文章（/article）。那么，app.js可以这样写：
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+var express = require('express');
+var app = express();
+
+app.get('/', function(req, res) {
+   res.sendfile('./views/index.html');
+});
+
+app.get('/about', function(req, res) {
+   res.sendfile('./views/about.html');
+});
+
+app.get('/article', function(req, res) {
+   res.sendfile('./views/article.html');
+});
+
+app.listen(3000);</pre>
+    </p>
+    <p>
+        上面代码是一个静态网页。如果想要展示动态内容，就必须使用动态网页模板。
+    </p>
+    <h4>
+        动态网页模板
+    </h4>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        网站真正的魅力在于动态网页，下面我们来看看，如何制作一个动态网页的网站。
+    </p>
+    <p>
+        安装模板引擎<br />
+        Express支持多种模板引擎，这里采用Handlebars模板引擎的服务器端版本hbs模板引擎。<br />
+        先安装hbs。
+        <pre style="margin-top:1px;">npm install hbs --save-dev</pre>
+    </p>
+    <p>
+        上面代码将hbs模块，安装在项目目录的子目录node_modules之中。save-dev参数表示，将依赖关系写入package.json文件。安装以后的package.json文件变成下面这样：
+        <pre style="margin-top:1px;">
+// package.json文件
+{
+    "name": "demo",
+    "description": "My First Express App",
+    "version": "0.0.1",
+    "dependencies": {
+        "express": "4.x"
+    },
+    "devDependencies": {
+        "hbs": "~2.3.1"
+    }
+}</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p style="margin-top:1px;padding-top:1px;">
+        安装模板引擎之后，就要改写app.js。
+        <pre style="margin-top:1px;margin-bottom:1px;">
+// app.js文件
+var express = require('express');
+var app = express();
+// 加载hbs模块
+var hbs = require('hbs');
+// 指定模板文件的后缀名为html
+app.set('view engine', 'html');
+// 运行hbs模块
+app.engine('html', hbs.__express);
+app.get('/', function (req, res){
+    res.render('index');
+});
+app.get('/about', function(req, res) {
+    res.render('about');
+});
+app.get('/article', function(req, res) {
+    res.render('article');
+});</pre>
+    </p>
+    <p style="margin-top:1px;padding-top:1px;">
+        上面代码改用render方法，对网页模板进行渲染。render方法的参数就是模板的文件名，默认放在子目录views之中，后缀名已经在前面指定为html，这里可以省略。所以，res.render('index') 就是指，把子目录views下面的index.html文件，交给模板引擎hbs渲染。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+
     </p>
 </article>
 

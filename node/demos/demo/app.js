@@ -7,6 +7,10 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var api = require('./routes/api');
+// 加载hbs模块
+var hbs = require('hbs');
+
 var app = express();
 
 // 设定port变量，意为访问端口
@@ -16,7 +20,12 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 
 // 设定view engine变量，意为网页模板引擎
-app.set('view engine', 'jade');
+//app.set('view engine', 'jade');
+
+// 指定模板文件的后缀名为html
+app.set('view engine', 'html');
+// 运行hbs模块
+app.engine('html', hbs.__express);
 
 //app.use(express.favicon());
 //app.use(express.logger('dev'));
@@ -39,13 +48,41 @@ app.use(express.static(path.join(__dirname, 'public')));
     res.send('Hello World');
 });*/
 
-app.get('/', function(req, res){
+/*app.get('/', function(req, res){
     var body = 'Hello World';
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Content-Length', body.length);
     res.end(body);
+});*/
+
+app.get('/api', function(request, response) {
+    response.send({name:"张三",age:40});
+});
+
+app.get('/api', api.index);
+
+/*app.get('/', function(req, res) {
+    res.sendfile('./views/index.html');
+});
+
+app.get('/about', function(req, res) {
+    res.sendfile('./views/about.html');
+});
+
+app.get('/article', function(req, res) {
+    res.sendfile('./views/article.html');
+});*/
+
+app.get('/', function (req, res){
+    res.render('index');
+});
+app.get('/about', function(req, res) {
+    res.render('about');
+});
+app.get('/article', function(req, res) {
+    res.render('article');
 });
 
 app.listen(app.get('port'));
 
-console.log("server start at 3000...");
+console.log("server start at " + app.get('port') + "...");
