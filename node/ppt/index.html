@@ -986,8 +986,60 @@ app.get('/article', function(req, res) {
     <h3>
         Express简介
     </h3>
+    <h4 style="margin-top:10px;margin-bottom:10px;">
+        新建数据脚本
+    </h4>
     <p>
+        渲染是指将数据代入模板的过程。实际运用中，数据都是保存在数据库之中的，这里为了简化问题，假定数据保存在一个脚本文件中。
+        在项目目录中，新建一个文件blog.js，用于存放数据。blog.js的写法符合CommonJS规范，使得它可以被require语句加载。
+        <pre style="margin-top:1px;">
+// blog.js文件
+var entries = [
+    {"id":1, "title":"第一篇", "body":"正文", "published":"6/2/2013"},
+    {"id":2, "title":"第二篇", "body":"正文", "published":"6/3/2013"},
+    {"id":3, "title":"第三篇", "body":"正文", "published":"6/4/2013"},
+    {"id":4, "title":"第四篇", "body":"正文", "published":"6/5/2013"},
+    {"id":5, "title":"第五篇", "body":"正文", "published":"6/10/2013"},
+    {"id":6, "title":"第六篇", "body":"正文", "published":"6/12/2013"}
+];
+exports.getBlogEntries = function () {
+    return entries;
+}
+exports.getBlogEntry = function (id) {
+    for(var i=0; i < entries.length; i++) {
+        if(entries[i].id == id)
+            return entries[i];
+    }
+}</pre>
+    </p>
+</article>
 
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h4>
+        新建网页模板
+    </h4>
+    <p>
+        接着，新建模板文件index.html。
+        <pre>
+    <!-- views/index.html文件 -->
+&lt;h1&gt;文章列表&lt;/h1&gt;
+{{#each entries}}
+&lt;p&gt;
+    &lt;a href="/article/{{id}}">{{title}}&lt;/a&gt;&lt;br/&gt;
+    Published: {{published}}
+&lt;/p&gt;
+{{/each}}</pre>
+    </p>
+    <p>
+        模板文件about.html。
+        <pre>
+&lt;!-- views/about.html文件 --&gt;
+&lt;h1&gt;自我介绍&lt;/h1&gt;
+&lt;p&gt;正文&lt;/p&gt;
+</pre>
     </p>
 </article>
 
@@ -996,7 +1048,64 @@ app.get('/article', function(req, res) {
         Express简介
     </h3>
     <p>
+        模板文件article.html。
+        <pre style="margin-top:1px;margin-bottom: 1px;">
+&lt;!-- views/article.html文件 --&gt;
+&lt;h1>{{blog.title}}&lt;/h1&gt;
+Published: {{blog.published}}
+&lt;p/&gt;
+{{blog.body}}</pre>
+    </p>
+    <p style="margin-top:1px;">
+        可以看到，上面三个模板文件都只有网页主体。因为网页布局是共享的，所以布局的部分可以单独新建一个文件layout.html。
+        <pre style="margin-top:1px;">
+&lt;!-- views/layout.html文件 --&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;{{title}}&lt;/title&gt;
+    &lt;/head&gt;
+&lt;body&gt;
+{{{body}}}
+&lt;footer&gt;
+    &lt;p&gt;
+        &lt;a href="/"&gt;首页&lt;/a&gt; - &lt;a href="/about"&gt;自我介绍&lt;/a&gt;
+    &lt;/p&gt;
+&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    </p>
+</article>
 
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h4 style="margin-top:10px;margin-bottom: 10px;">
+        渲染模板
+    </h4>
+    <p>
+        最后，改写app.js文件。
+        <pre style="margin-top:1px;">
+// app.js文件
+var express = require('express');
+var app = express();
+var hbs = require('hbs');
+// 加载数据模块
+var blogEngine = require('./blog');
+app.set('view engine', 'html');
+app.engine('html', hbs.__express);
+app.use(express.bodyParser());
+app.get('/', function(req, res) {
+    res.render('index',{title:"最近文章", entries:blogEngine.getBlogEntries()});
+});
+app.get('/about', function(req, res) {
+    res.render('about', {title:"自我介绍"});
+});
+app.get('/article/:id', function(req, res) {
+    var entry = blogEngine.getBlogEntry(req.params.id);
+    res.render('article',{title:entry.title, blog:entry});
+});
+app.listen(3000);</pre>
     </p>
 </article>
 
@@ -1005,7 +1114,162 @@ app.get('/article', function(req, res) {
         Express简介
     </h3>
     <p>
+        上面代码中的render方法，现在加入了第二个参数，表示模板变量绑定的数据。
+        现在重启node服务器，然后访问http://127.0.0.1:3000。
+        <pre>node app.js</pre>
+    </p>
+    <p>
+        可以看得，模板已经使用加载的数据渲染成功了。
+    </p>
+    <h4 style="margin-top:10px;margin-bottom: 10px;">
+        指定静态文件目录
+    </h4>
+    <p>
+        模板文件默认存放在views子目录。这时，如果要在网页中加载静态文件（比如样式表、图片等），就需要另外指定一个存放静态文件的目录。
+    <pre>app.use(express.static('public'));</pre>
+    </p>
+    <p>
+        上面代码在文件app.js之中，指定静态文件存放的目录是public。于是，当浏览器发出非HTML文件请求时，服务器端就到public目录寻找这个文件。比如，浏览器发出如下的样式表请求：
+    <pre>&lt;link href="/bootstrap/css/bootstrap.css" rel="stylesheet"&gt;</pre>
+    </p>
+</article>
 
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        服务器端就到public/bootstrap/css/目录中寻找bootstrap.css文件。
+    </p>
+    <h4>
+        ExpressJS 4.0的Router用法
+    </h4>
+    <p>
+        Express 4.0的Router用法，做了大幅改变，增加了很多新的功能。Router成了一个单独的组件，好像小型的express应用程序一样，有自己的use、get、param和route方法。<br />
+        基本用法<br />
+        Express 4.0的router对象，需要单独新建。然后，使用该对象的HTTP动词方法，为不同的访问路径，指定回调函数；最后，挂载到某个路径<br />
+        <pre>
+var router = express.Router();
+router.get('/', function(req, res) {
+    res.send('首页');
+});
+router.get('/about', function(req, res) {
+    res.send('关于');
+});
+app.use('/', router);</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        上面代码先定义了两个访问路径，然后将它们挂载到根目录。如果最后一行改为app.use('/app', router)，则相当于/app和/app/about这两个路径，指定了回调函数。
+    </p>
+    <p>
+        这种挂载路径和router对象分离的做法，为程序带来了更大的灵活性，既可以定义多个router对象，也可以为将同一个router对象挂载到多个路径。
+    </p>
+    <h5 style="margin-top:10px;margin-bottom: 10px;">router.route方法</h5>
+    <p>
+        router实例对象的route方法，可以接受访问路径作为参数。
+        <pre style="margin-top: 1px;">
+var router = express.Router();
+router.route('/api')
+    .post(function(req, res) {
+        // ...
+    })
+    .get(function(req, res) {
+        Bear.find(function(err, bears) {
+            if (err)
+                res.send(err);
+            res.json(bears);
+        });
+    });
+app.use('/', router);</pre>
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <h5 style="margin-top:10px;margin-bottom: 10px;">router中间件</h5>
+    <p>
+        use方法为router对象指定中间件，即在数据正式发给用户之前，对数据进行处理。下面就是一个中间件的例子。
+        <pre>
+router.use(function(req, res, next) {
+    console.log(req.method, req.url);
+    next();
+});</pre>
+    </p>
+    <p>
+        上面代码中，回调函数的next参数，表示接受其他中间件的调用。函数体中的next()，表示将数据传递给下一个中间件。
+    </p>
+    <p>
+        注意，中间件的放置顺序很重要，等同于执行顺序。而且，中间件必须放在HTTP动词方法之前，否则不会执行。
+    </p>
+    <h5 style="margin-top:10px;margin-bottom: 10px;">对路径参数的处理</h5>
+    <p>
+        router对象的param方法用于路径参数的处理，可以
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+router.param('name', function(req, res, next, name) {
+    // 对name进行验证或其他处理……
+    console.log(name);
+    req.name = name;
+    next();
+});
+
+router.get('/hello/:name', function(req, res) {
+    res.send('hello ' + req.name + '!');
+});</pre>
+    </p>
+    <p>
+        上面代码中，get方法为访问路径指定了name参数，param方法则是对name参数进行处理。注意，param方法必须放在HTTP动词方法之前。
+    </p>
+    <h5 style="margin-top:10px;margin-bottom: 10px;">app.route</h5>
+    <p>
+        假定app是Express的实例对象，Express 4.0为该对象提供了一个route属性。app.route实际上是express.Router()的缩写形式，除了直接挂载到根路径。因此，对同一个路径指定get和post方法的回调函数，可以写成链式形式。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        Express简介
+    </h3>
+    <p>
+        <pre>
+app.route('/login')
+    .get(function(req, res) {
+        res.send('this is the login form');
+    })
+    .post(function(req, res) {
+        console.log('processing');
+        res.send('processing the login form!');
+    });</pre>
+    </p>
+    <p>
+        上面代码的这种写法，显然非常简洁清晰。
+    </p>
+</article>
+
+<article class="smaller">
+    <h3>
+        MVC设计
+    </h3>
+    <p>
+        使用Router和模板
+    </p>
+    <p>
+        其他框架backbone和underscore都可以尝试使用
     </p>
 </article>
 

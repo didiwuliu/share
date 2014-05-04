@@ -13,6 +13,9 @@ var hbs = require('hbs');
 
 var app = express();
 
+// 加载数据模块
+var blogEngine = require('./blog');
+
 // 设定port变量，意为访问端口
 app.set('port', process.env.PORT || 3000);
 
@@ -73,7 +76,7 @@ app.get('/article', function(req, res) {
     res.sendfile('./views/article.html');
 });*/
 
-app.get('/', function (req, res){
+/*app.get('/', function (req, res){
     res.render('index');
 });
 app.get('/about', function(req, res) {
@@ -81,6 +84,19 @@ app.get('/about', function(req, res) {
 });
 app.get('/article', function(req, res) {
     res.render('article');
+});*/
+
+app.get('/', function(req, res) {
+    res.render('index',{title:"最近文章", entries:blogEngine.getBlogEntries()});
+});
+
+app.get('/about', function(req, res) {
+    res.render('about', {title:"自我介绍"});
+});
+
+app.get('/article/:id', function(req, res) {
+    var entry = blogEngine.getBlogEntry(req.params.id);
+    res.render('article',{title:entry.title, blog:entry});
 });
 
 app.listen(app.get('port'));
