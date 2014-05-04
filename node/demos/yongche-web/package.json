@@ -1,0 +1,31 @@
+{
+    "name": "yongche-web",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "3.2.6",
+        "cookie-signature": "1.0.1",
+        "ejs": "*",
+        "stylus": "*",
+        "redis": "*",
+        "mysql": "*",
+        "forward": "*",
+        "connect": "*",
+        "pm": "*",
+        "urlrouter": "*",
+        "connect-redis": "*",
+        "generic-pool": "*",
+        "async": "*",
+        "mongoskin": "0.6.0",
+        "log4js":"*"
+    },
+    "devDependencies": {
+        "should": "*",
+        "mocha": "*",
+        "jscover": "*",
+        "supertest": "*"
+    }
+}

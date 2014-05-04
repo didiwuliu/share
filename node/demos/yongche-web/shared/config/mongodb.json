@@ -1,0 +1,5 @@
+{
+    "url": "localhost:27017?auto_reconnect=true&poolSize=10",
+    "database": "ucenter",
+    "safe": true
+}

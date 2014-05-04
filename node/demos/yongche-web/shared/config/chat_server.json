@@ -1,0 +1,11 @@
+{
+    "development": {
+        "host": "localhost",
+        "port": 4010
+    },
+
+    "production": {
+        "host": "localhost",
+        "port": 4010
+    }
+}

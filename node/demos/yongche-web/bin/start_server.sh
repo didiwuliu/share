@@ -1,0 +1,1 @@
+nohup /usr/local/bin/redis_server_ctl /dev/null 2>&1 &
