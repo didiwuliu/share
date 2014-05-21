@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/style.css"/>
+        <script type="text/javascript" src="lib/jquery.js"></script>
+        <script type="text/javascript" src="http://10.1.5.13:3000/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            var socket = io.connect('http://10.1.5.13:3000');
+
+            socket.on("connection", function(data){
+                console.log("connection");
+            });
+
+            socket.on("user connected", function(data){
+                console.log("user connected");
+            });
+
+            socket.on("disconnected", function(data){
+                console.log("disconnected");
+            });
+        </script>
+        <script type="text/javascript" src="js/drawing_board.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </head>
+    <body>
+        <div id="drawing-area">
+            <canvas></canvas>
+        </div>
+        <div id="controls">
+            <div id="color-selector" class="control-group">
+                <div class="button black selected"></div>
+                <div class="button red"></div>
+                <div class="button yellow"></div>
+                <div class="button green"></div>
+                <div class="button blue"></div>
+                <div class="button white"></div>
+            </div>
+            <div id="file-controls" class="control-group">
+                <div class="button" id="clear-button">
+                    <canvas width="60" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

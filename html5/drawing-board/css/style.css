@@ -1,0 +1,71 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  background-color: #CCC;
+}
+
+canvas {
+  display: block;
+}
+
+#drawing-area {
+  position: absolute;
+  top: 0px;
+  bottom: 60px;
+  width: 100%;
+  background-color: white;
+}
+
+#controls {
+  position: absolute;
+  bottom: 0px;
+  height: 60px;
+  width: 100%;
+}
+
+#controls .control-group {
+  float: left;
+  height: 100%;
+}
+
+#controls .control-group#file-controls {
+  float: right;
+}
+
+#controls .button {
+  height: 60px;
+  width: 60px;
+  float: left;
+}
+
+#controls .button.selected {
+  border: 4px solid #BBF;
+  height: 52px;
+  width: 52px;
+}
+
+.black {
+  background-color: black;
+}
+
+.red {
+  background-color: red;
+}
+
+.blue {
+  background-color: blue;
+}
+
+.green {
+  background-color: green;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.white {
+  background-color: white;
+}
+

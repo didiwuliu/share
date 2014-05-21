@@ -1,0 +1,29 @@
+{
+    "name": "socket.io",
+    "version": "1.0.0",
+    "description": "drawing board server",
+    "keywords": [
+        "realtime",
+        "framework",
+        "websocket",
+        "tcp",
+        "events",
+        "socket",
+        "io"
+    ],
+    "scripts": {
+        "test": "make test"
+    },
+    "dependencies": {
+        "socket.io": "*"
+    },
+    "devDependencies": {
+        "mocha": "1.16.2"
+    },
+    "contributors": [
+        {
+            "name": "ZhangChunsheng",
+            "email": "zhangchunsheng423@gmail.com"
+        }
+    ]
+}
