@@ -43,8 +43,14 @@ io.sockets.on('connection', function (socket) {//connect message disconnect
         will: 'be received by everyone'
     });
 
+    /**
+     * 获得输入的xy并广播到所有客户端
+     * {x:1,y:1}
+     */
     socket.on('point', function(data) {
         console.log(data);
+        //io.sockets.emit('draw point', data);
+        socket.broadcast.emit('draw point', data);
     });
 
     socket.on('private message', function (from, msg) {

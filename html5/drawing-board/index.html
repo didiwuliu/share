@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>drawing board</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
         <link rel="stylesheet" href="css/style.css"/>
         <script type="text/javascript" src="lib/jquery.js"></script>
         <script type="text/javascript" src="http://10.1.5.13:3000/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            var socket = io.connect('http://10.1.5.13:3000');
+            if(typeof io != "undefined") {
+                var socket = io.connect('http://10.1.5.13:3000');
 
-            socket.on("connection", function(data){
-                console.log("connection");
-            });
+                socket.on("connection", function(data){
+                    console.log("connection");
+                });
 
-            socket.on("user connected", function(data){
-                console.log("user connected");
-            });
+                socket.on("user connected", function(data){
+                    console.log("user connected");
+                });
 
-            socket.on("disconnected", function(data){
-                console.log("disconnected");
-            });
+                socket.on("disconnected", function(data){
+                    console.log("disconnected");
+                });
+            }
         </script>
         <script type="text/javascript" src="js/drawing_board.js"></script>
         <script type="text/javascript" src="js/main.js"></script>

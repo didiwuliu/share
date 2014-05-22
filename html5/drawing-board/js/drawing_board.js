@@ -1,8 +1,20 @@
+/**
+ * Copyright(c)2013,Luomor,www.luomor.com
+ * Version: 1.0
+ * Author: ZhangChunsheng
+ * Email: zhangchunsheng423@gmail.com
+ * Date: 2014-05-22
+ * Description: drawing_board.js
+ */
 (function (window) {
     var DrawingBoard = function () {
         var canvas = new Canvas();
         var colorSelector = new ColorSelector(canvas);
         var clearButton = new ClearButton(canvas);
+
+        this.canvas = canvas;
+        this.colorSelector = colorSelector;
+        this.clearButton = clearButton;
 
         this.init = function () {
             canvas.init();
@@ -51,10 +63,12 @@
 
         this.mousemove = function (e) {
             if (drawing) {
-                socket.emit("point", {
-                    x: e.pageX,
-                    y: e.pageY
-                });
+                if(socket) {
+                    socket.emit("point", {
+                        x: e.pageX,
+                        y: e.pageY
+                    });
+                }
                 canvas.stroke(e);
             }
         };
