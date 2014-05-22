@@ -7,6 +7,72 @@
  * Description: drawing_board.js
  */
 (function (window) {
+    /**
+     * Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_2 like Mac OS X; zh-cn) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5
+     *
+     * Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; zh-cn) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5
+     *
+     * MQQBrowser/25 (Linux; U; 2.3.3; zh-cn; HTC Desire S Build/GRI40;480*800)
+     *
+     * Mozilla/5.0 (Linux; U; Android 2.3.3; zh-cn; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+     *
+     * Mozilla/5.0 (SymbianOS/9.3; U; Series60/3.2 NokiaE75-1 /110.48.125 Profile/MIDP-2.1 Configuration/CLDC-1.1 ) AppleWebKit/413 (KHTML, like Gecko) Safari/413
+     *
+     * Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; zh-cn) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8J2
+     *
+     * Mozilla/5.0 (Windows NT 5.2) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.122 Safari/534.30
+     *
+     * Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1
+     *
+     * Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/534.51.22 (KHTML, like Gecko) Version/5.1.1 Safari/534.51.22
+     *
+     * Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A5313e Safari/7534.48.3
+     *
+     * Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A5313e Safari/7534.48.3
+     *
+     * Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A5313e Safari/7534.48.3
+     *
+     * Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1
+     *
+     * Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; SAMSUNG; OMNIA7)　　　　　　----SAMSUNG MP7
+     *
+     * Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; XBLWP7; ZuneWP7)  　　　　　　　　----HTC MP7
+     *
+     * @returns {boolean}
+     */
+    function isMobile() {
+        var flag = false;
+
+        var keywords = ["Android", "iPhone", "iPod", "iPad", "Windows Phone", "MQQBrowser"];
+
+        var agent = navigator.userAgent;
+        if (agent.indexOf("Windows NT") < 0 || (agent.indexOf("Windows NT") >= 0 && agent.indexOf("compatible; MSIE 9.0;") >= 0)) {
+            //排除 苹果桌面系统
+            if (agent.indexOf("Windows NT") < 0 && agent.indexOf("Macintosh") < 0) {
+                for (var keyword in keywords) {
+                    if (agent.indexOf(keyword) >= 0) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return flag;
+    }
+
+    function getPlatform() {
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+            return "ios";
+        } else if (/(Android)/i.test(navigator.userAgent)) {
+            return "android";
+        } else {
+            return "pc";
+        };
+    }
+
+    var platform = getPlatform();
+
     var DrawingBoard = function () {
         var canvas = new Canvas();
         var colorSelector = new ColorSelector(canvas);
@@ -61,13 +127,23 @@
     var CanvasEventHandler = function (canvas) {
         var drawing = false;
 
-        this.mousedown = function (e) {
+        var mouseDown = "mousedown";
+        var mouseMove = "mousemove";
+        var mouseUp = "mouseup";
+
+        if(platform == "android" || platform == "ios") {
+            mouseDown = "touchstart";
+            mouseMove = "touchmove";
+            mouseUp = "touchend";
+        }
+
+        this[mouseDown] = function (e) {
             drawing = true;
             canvas.stroke(e);
             return false;
         };
 
-        this.mousemove = function (e) {
+        this[mouseMove] = function (e) {
             if (drawing) {
                 if(socket) {
                     socket.emit("point", {
@@ -80,7 +156,7 @@
             }
         };
 
-        this.mouseup = function (e) {
+        this[mouseUp] = function (e) {
             drawing = false;
         };
     };
