@@ -31,6 +31,8 @@
         var canvasEl = $canvas[0];
         var ctx = canvasEl.getContext("2d");
 
+        this.ctx = ctx;
+
         this.init = function () {
             $canvas.bind(new CanvasEventHandler(this));
         }
@@ -43,6 +45,10 @@
         this.setColor = function (color) {
             ctx.fillStyle = color;
         };
+
+        this.getColor = function() {
+            return ctx.fillStyle;
+        }
 
         this.stroke = function (e) {
             ctx.beginPath();
@@ -66,7 +72,8 @@
                 if(socket) {
                     socket.emit("point", {
                         x: e.pageX,
-                        y: e.pageY
+                        y: e.pageY,
+                        color: canvas.ctx.fillStyle
                     });
                 }
                 canvas.stroke(e);

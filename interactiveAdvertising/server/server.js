@@ -26,6 +26,8 @@ function handler (req, res) {
     });
 }
 
+var points = [];
+
 io.sockets.on('connection', function (socket) {//connect message disconnect
     socket.emit('news', {
         hello: 'world'
@@ -43,6 +45,10 @@ io.sockets.on('connection', function (socket) {//connect message disconnect
         will: 'be received by everyone'
     });
 
+    socket.emit('init', {
+        points: points
+    });
+
     /**
      * 获得输入的xy并广播到所有客户端
      * {x:1,y:1}
@@ -50,6 +56,7 @@ io.sockets.on('connection', function (socket) {//connect message disconnect
     socket.on('point', function(data) {
         console.log(data);
         //io.sockets.emit('draw point', data);
+        points.push(data);
         socket.broadcast.emit('draw point', data);
     });
 
