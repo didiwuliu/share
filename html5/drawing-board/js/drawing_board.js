@@ -119,7 +119,12 @@
 
         this.init = function () {
             render();
-            $clearCanvas.click(drawingCanvas.resizeCanvas);
+            $clearCanvas.click(function() {
+                if(socket) {
+                    socket.emit("clear");
+                }
+                drawingCanvas.resizeCanvas();
+            });
         };
     };
 

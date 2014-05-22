@@ -60,6 +60,11 @@ io.sockets.on('connection', function (socket) {//connect message disconnect
         socket.broadcast.emit('draw point', data);
     });
 
+    socket.on('clear', function() {
+        points = [];
+        socket.broadcast.emit('clear');
+    });
+
     socket.on('private message', function (from, msg) {
         console.log('I received a private message by ', from, ' saying ', msg);
     });
