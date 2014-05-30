@@ -101,12 +101,12 @@
 
         this.init = function () {
             $canvas.bind(new CanvasEventHandler(this));
-        }
+        };
 
         this.resizeCanvas = function () {
             canvasEl.width = drawingArea.width();
             canvasEl.height = drawingArea.height();
-        }
+        };
 
         this.setColor = function (color) {
             ctx.fillStyle = color;
@@ -114,13 +114,18 @@
 
         this.getColor = function() {
             return ctx.fillStyle;
-        }
+        };
 
         this.stroke = function (e) {
             ctx.beginPath();
             ctx.arc(e.pageX, e.pageY, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.closePath();
+        };
+
+        this.getColorSelector = function() {
+            var colorSelector = $("div.selected");
+            return colorSelector.css("background-color");
         };
     };
 
@@ -137,6 +142,7 @@
             mouseUp = "touchend";
 
             document.getElementById("canvas").addEventListener(mouseDown, function(touchEvent) {
+                canvas.setColor(canvas.getColorSelector());
                 drawing = true;
                 var e = touchEvent.touches[0];
                 send(e);
@@ -157,6 +163,7 @@
             });
         } else {
             this[mouseDown] = function (e) {
+                canvas.setColor(canvas.getColorSelector());
                 drawing = true;
                 send(e);
                 canvas.stroke(e);

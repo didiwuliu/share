@@ -5,6 +5,7 @@ $(function() {
     if(socket) {
         socket.on("init", function(data) {
             var points = data.points;
+            var color = app.canvas.getColor();
             for(var i = 0 ; i < points.length ; i++) {
                 app.canvas.setColor(points[i].color);
                 app.canvas.stroke({
@@ -12,6 +13,7 @@ $(function() {
                     pageY: points[i].y
                 });
             }
+            app.canvas.setColor(color);
         });
 
         socket.on("draw point", function(data) {
