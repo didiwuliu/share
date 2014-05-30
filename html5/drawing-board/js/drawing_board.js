@@ -141,7 +141,7 @@
                 var e = touchEvent.touches[0];
                 send(e);
                 canvas.stroke(e);
-                return false;
+                touchEvent.preventDefault();//important
             });
 
             document.getElementById("canvas").addEventListener(mouseMove, function(touchEvent) {
