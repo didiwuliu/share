@@ -135,30 +135,55 @@
             mouseDown = "touchstart";
             mouseMove = "touchmove";
             mouseUp = "touchend";
+
+            document.getElementById("canvas").addEventListener(mouseDown, function(touchEvent) {
+                drawing = true;
+                var e = touchEvent.touches[0];
+                send(e);
+                canvas.stroke(e);
+                return false;
+            });
+
+            document.getElementById("canvas").addEventListener(mouseMove, function(touchEvent) {
+                if (drawing) {
+                    var e = touchEvent.touches[0];
+                    send(e);
+                    canvas.stroke(e);
+                }
+            });
+
+            document.getElementById("canvas").addEventListener(mouseUp, function(touchEvent) {
+                drawing = false;
+            });
+        } else {
+            this[mouseDown] = function (e) {
+                drawing = true;
+                send(e);
+                canvas.stroke(e);
+                return false;
+            };
+
+            this[mouseMove] = function (e) {
+                if (drawing) {
+                    send(e);
+                    canvas.stroke(e);
+                }
+            };
+
+            this[mouseUp] = function (e) {
+                drawing = false;
+            };
         }
 
-        this[mouseDown] = function (e) {
-            drawing = true;
-            canvas.stroke(e);
-            return false;
-        };
-
-        this[mouseMove] = function (e) {
-            if (drawing) {
-                if(socket) {
-                    socket.emit("point", {
-                        x: e.pageX,
-                        y: e.pageY,
-                        color: canvas.ctx.fillStyle
-                    });
-                }
-                canvas.stroke(e);
+        function send(e) {
+            if(socket) {
+                socket.emit("point", {
+                    x: e.pageX,
+                    y: e.pageY,
+                    color: canvas.ctx.fillStyle
+                });
             }
-        };
-
-        this[mouseUp] = function (e) {
-            drawing = false;
-        };
+        }
     };
 
     var ColorSelector = function (canvas) {
