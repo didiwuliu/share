@@ -11,15 +11,92 @@
     <title>世界杯</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../../lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../lib/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>常规时间</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="well well-sm text-center">德国</div>
+            </div>
+            <div class="col-md-3">
+                <div id="regular_time_german" class="well well-sm text-center">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="well well-sm text-center">阿根廷</div>
+            </div>
+            <div class="col-md-3">
+                <div id="regular_time_argentina" class="well well-sm text-center">0</div>
+            </div>
+        </div>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="../../lib/js/jquery.min.js"></script>
-<script src="../../lib/js/bootstrap.min.js"></script>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>加时赛</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="well well-sm text-center">德国</div>
+            </div>
+            <div class="col-md-3">
+                <div id="extra_time_german" class="well well-sm text-center">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="well well-sm text-center">阿根廷</div>
+            </div>
+            <div class="col-md-3">
+                <div id="extra_time_argentina" class="well well-sm text-center">0</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>点球</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="well well-sm text-center">德国</div>
+            </div>
+            <div class="col-md-3">
+                <div id="penalty_kick_german" class="well well-sm text-center">0</div>
+            </div>
+            <div class="col-md-3">
+                <div class="well well-sm text-center">阿根廷</div>
+            </div>
+            <div class="col-md-3">
+                <div id="penalty_kick_argentina" class="well well-sm text-center">0</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button id="forecast" type="button" class="btn btn-success center-block btn-block btn-lg">神预测</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>比赛结果</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="result" class="well"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../../lib/js/jquery.min.js"></script>
+    <script src="../../lib/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./assets/js/index.js"></script>
 </body>
 </html>
