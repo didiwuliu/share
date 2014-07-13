@@ -35,10 +35,10 @@ $(document).ready(function() {
 
         if(result.isWin > 0) {
             setData(result);
-            $("#result").html("德国胜，德国" + result.total_german_score + ":" + result.total_argentina_score);
+            $("#result").html("德国胜，德国" + result.total_german_score + ":" + result.total_argentina_score + "阿根廷");
         } else if(result.isWin < 0) {
             setData(result);
-            $("#result").html("阿根廷胜，德国" + result.total_argentina_score + ":" + result.total_german_score);
+            $("#result").html("阿根廷胜，阿根廷" + result.total_argentina_score + ":" + result.total_german_score + "德国");
         } else if(result.isWin == 0) {
             setData(result);
             $("#result").html("不可以平局啊");
