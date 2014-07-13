@@ -6,147 +6,117 @@
  * Date: 2014-05-18
  * Description: index.js
  */
-var DI = (function() {
-    var DI = {
-        isDebug: false,
-        canvas: null,
-        context: null,
-        lang: null,
-        canUseLang: {
-            'en' : 'en_US',
-            'zh' : 'zh_TW',
-            'de' : 'de_DE',
-            'es' : 'es_ES',
-            'fr' : 'fr_FR',
-            'it' : 'it_IT',
-            'ja' : 'ja_JP',
-            'ko' : 'ko_KR',
-            'pt' : 'pt_BR',
-            'ru' : 'ru_RU',
-            'zh-cn':'zh_CN'
-        },
-        board: {
-            mouseX: 100,
-            mouseY: 100,
-            angle: 0,
-            radius: 0,
-            ballstyle: '.',
-            ballcolor: '#FF0000',
-            allzindex: 0,
-            opos: {} //old position
-        },
-        offset: {
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0
-        },
-        sceneSize: {
-            width: 480,
-            height: 320
-        },
-        deviceType: "pc",
-        enums: {
-            deviceType: {
-                touch: 1,
-                pc: 2
-            }
-        },
-        sys: {
-            fps: 60
+var canvas;
+var ctx; //2d画布
+var screenWidth; //画布宽度
+var screenHeight; //画布高度
+var radius = 50; //初始圆半径
+var step = 10; //每次半径递增大小
+var winImg = new Image(); //胜利图片
+var lostImg = new Image();//失败图片
+var gameRunning = false; //游戏运行状态
+var gameloopId; //记住循环的变量
+var circle;
+
+//公用 定义一个游戏物体戏对象
+function GameObject() {
+    this.x = 0;
+    this.y = 0;
+    this.radius = 50;
+    this.color = '#ff8130';
+    this.opacity = 1;
+}
+
+//定义圆 继承游戏对象GameObject
+function Circle() {
+    this.lineWidth = 1;
+};
+Circle.prototype = new GameObject(); //游戏对象GameObject
+
+function gameLoop() {
+    //清除屏幕
+    ctx.clearRect(0, 0, screenWidth, screenHeight);
+    ctx.save();
+
+    ctx.beginPath();
+    //绘制圆
+    ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+    ctx.lineWidth = circle.lineWidth;
+    ctx.strokeStyle = circle.color;
+    ctx.stroke();
+    ctx.fillStyle = circle.color;
+    ctx.fill();
+
+    ctx.restore();
+}
+
+//事件处理
+function addEventHandlers() {
+    canvas.addEventListener("click", function(e) {
+        var x = e.x;
+        var y = e.y;
+        log("x: " + x + " " + (circle.x - circle.radius) + " " + (circle.x + circle.radius));
+        log("y: " + y + " " + (circle.y - circle.radius) + " " + (circle.y + circle.radius));
+        if(x >= circle.x - circle.radius && x <= circle.x + circle.radius
+            && y >= circle.y - circle.radius && y <= circle.y + circle.radius) {
+            circle.radius += step;
         }
-    };
+    });
+}
 
-    return DI;
-})();
+function log(info) {
+    //console.log(info);
+}
 
-window.DI = DI;
+function loadImages() {
+    gameLoop();
+}
 
-(function(DI) {
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext("2d");
+function initCircle() {
+    circle = new Circle();
+    circle.x = 120;
+    circle.y = 200;
+}
 
-    var _lang = (navigator.language || navigator.browserLanguage).toLowerCase();
-    _lang = (_lang === 'zh-cn') ? 'zh-cn' : _lang.slice(0, _lang.indexOf("_"));
-    DI.lang =  DI.canUseLang[_lang] || 'en_US';
+function enoughRadius() {
+    if(circle.radius >= 600) {
+        return true;
+    }
+    return false;
+}
 
-    /**
-     * init
-     */
-    DI.init = function() {
-        DI.canvas = canvas;
-        DI.context = context;
+function toggleGameplay() {
+    gameRunning = !gameRunning;
+    if (gameRunning) {
+        gameloopId = setInterval(gameLoop, 100);
+    } else {
+        clearInterval(gameloopId);
+    }
+}
 
-        //DI.drawTest(DI.context);
+function gameOver() {
+    gameRunning = false;
+    clearInterval(gameloopId);
+    alert("游戏结束!");
+}
 
-        document.documentElement.onmousemove = function(e) {
-            DI.setXY(e);
-        }
-    };
+function drawWin() {
+    ctx.font = "12pt Arial";
+    ctx.fillText("胜利", 250, 25);
+}
 
-    DI.gameLoop = function() {
+function main() {
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d'); //获取2d画布
+    screenWidth = parseInt(canvas.width); //画布宽度
+    screenHeight = parseInt(canvas.height);
+    //初始化圆
+    initCircle();
 
-    };
+    addEventHandlers(); //添加事件
+    loadImages();
 
-    DI.setXY = function(e) {
-        var pos = DI.mousePos(e);
-        mouseX = pos.x;
-        mouseY = pos.y;
+    toggleGameplay();
+}
 
-        DI.drawLine(pos);
-
-        DI.board.opos = pos;
-    };
-
-    DI.drawDOM = function() {
-        ball = document.createElement("p");
-        ball.style.position = "absolute";
-        ball.style.color = DI.board.ballcolor;
-        ball.style.zIndex = DI.board.allzindex + 1;
-        ball.innerHTML = DI.board.ballstyle;
-        document.body.appendChild(ball);
-        document.all.selected = false;
-
-        ball.style["left"] = mouseX + "px";
-        ball.style["top"] = mouseY + "px";
-    };
-
-    DI.drawLine = function(npos) {
-        if(DI.board.opos) {
-            DI.context.beginPath();
-            // Start from the top-left point.
-
-            DI.context.moveTo(DI.board.opos.x, DI.board.opos.y);
-            DI.context.lineTo(npos.x, npos.y);
-
-            DI.context.stroke();
-            DI.context.closePath();
-        }
-    };
-
-    DI.mousePos = function(e) {
-        var x,y;
-        if(!document.all) {
-            x = e.pageX;
-            y = e.pageY;
-        } else {
-            x = event.clientX + document.documentElement.scrollLeft;
-            y = event.clientY + document.documentElement.scrollTop;
-        }
-        return {
-            x: x,
-            y: y
-        };
-    };
-
-    DI.drawTest = function(context) {
-        context.lineWidth = 5;          //定义线条宽度
-        context.strokeStyle = "red";    //定义线条颜色
-        context.moveTo(100, 100); //起始位置
-        context.lineTo(200, 200); //终止位置
-        context.stroke();               //结束图形
-    };
-    return DI;
-})(DI);
-
-DI.init();
+main();
