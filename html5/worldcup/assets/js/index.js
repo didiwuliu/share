@@ -97,7 +97,7 @@ function fight(round, result) {
         if(result.isWin != 0) {
             return;
         } else {
-            fight(ROUND.EXTRA_TIME, result);
+            fight(ROUND.PENALTY_KICK, result);
         }
     }
 }
