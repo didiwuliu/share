@@ -85,8 +85,8 @@ body {
     background-color: white;
 }
 
-.slides.template-yongche > article:not(.nobackground):not(.biglogo) {
-    background: url(images/yongche-logo-small.png) 710px 625px no-repeat;
+.slides.template-zhangyue > article:not(.nobackground):not(.biglogo) {
+    background: url(images/zhangyue-logo-small.png) 710px 625px no-repeat;
     background-color: white;
 }
 
@@ -97,9 +97,9 @@ body {
     background-color: white;
 }
 
-.slides.template-yongche > article:not(.nobackground):not(.biglogo) {
+.slides.template-zhangyue > article:not(.nobackground):not(.biglogo) {
     background: url(images/colorbar.png) 0 600px repeat-x,
-    url(images/yongche-logo.png) 640px 610px no-repeat;
+    url(images/zhangyue-logo.png) 640px 610px no-repeat;
     background-size: 100%, 225px;
     background-color: white;
 }
@@ -157,8 +157,8 @@ body {
     background-size: 600px;
 }
 
-.slides.template-yongche article.biglogo {
-    background: white url(images/yongche-logo.png) 50% 50% no-repeat;
+.slides.template-zhangyue article.biglogo {
+    background: white url(images/zhangyue-logo.png) 50% 50% no-repeat;
     background-size: 600px;
 }
 
