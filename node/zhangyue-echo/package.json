@@ -1,5 +1,5 @@
 {
-  "name": "yongche-echo",
+  "name": "zhangyue-echo",
   "version": "1.0.0",
   "description": "echo argv",
   "main": "./lib/echo.js",
